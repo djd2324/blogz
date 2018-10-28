@@ -1,0 +1,41 @@
+<!doctype html>
+<html>
+    <head>
+        <title>{{title}}</title>
+
+        <style> 
+         
+                .error { 
+                    color: rgb(255, 0, 0); 
+                } 
+        </style>
+
+
+    </head>
+<body>
+
+        <div>
+                <a href='/logout'>log out</a>
+        </div>
+
+        <div>
+                <a href='/'>home</a>
+        </div>
+
+
+        {% with messages = get_flashed_messages(with_categories=True) %}
+            <ul>
+            {% for category,message in messages %}
+                <li class="{{category}}">{{message}}</li>
+            {% endfor %}
+            </ul>
+        {% endwith %}
+
+
+    
+    {{message}}
+    {% block content %}
+    {% endblock %}
+
+</body>
+</html>

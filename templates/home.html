@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>Blogz</h1>
+
+    <form method = 'POST'>
+        <label>
+            Title:
+            <input type="text" name='title'/>
+        </label>
+        <p class='error'>{{title_error}}</p>
+
+        <label>
+            Body:
+            <textarea name='body' size='15' ></textarea>
+        </label>
+        <p class='error'>{{body_error}}</p>
+
+        <label>
+  
+
+        <input type="submit" value='Add Blog'>
+        
+    </form>
+        
+
+
+    {% if blogs|length == 0 %}
+        <p>No blogs yet</p>
+    {% else %}
+
+        
+            {% for blog in blogs %}
+            <a href='/blog?id={{blog.id}}'>
+            <p>{{blog.title}}</p></a>
+            <p>{{blog.body}} </p>
+            <p>{{blog.owner}} </p>
+            <hr />
+            {% endfor %}
+        
+
+    {% endif %}
+{% endblock %}

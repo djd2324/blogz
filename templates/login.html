@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block content %}
+ <html> 
+     <head> 
+        <h1>Login to BLOGZ</h1> 
+        <p>New users click here to <a href="/register">REGISTER</a></p>
+         <style> 
+         
+             .error { 
+                 color: rgb(255, 0, 0); 
+             } 
+         </style> 
+     </head> 
+     <body>          
+         <form method='POST'> 
+             <label for="username">Username</label> 
+                 <input name="username" type="text" value='{{username}}' /> 
+             </label> 
+             <p class= "error"> {{usernameerror}} </p> 
+ 
+ 
+             <label for="password">Password</label> 
+                 <input name="password" type="password" /> 
+             <p class= "error"> {{passworderror}} </p> 
+ 
+ 
+ 
+             <input type="submit" value="Login"> 
+         </form> 
+     </body> 
+ </html> 
+ {% endblock %}
