@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block content %}
+    {% if authors|length == 0 %}
+        <p>No authors yet</p>
+    {% else %}
+
+
+        {% for author in authors %}
+        
+        <a href='/singleuser?user={{author.id}}'>
+        {{author.username}}</a>
+        
+        
+        <hr />
+        {% endfor %}
+
+
+    {% endif %}
+
+
+    
+{% endblock %}

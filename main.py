@@ -12,7 +12,7 @@ class Blog(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     title = db.Column(db.String(100))
     body = db.Column(db.Text)
-    owner = db.Column(db.Integer, db.ForeignKey('user.id'))
+    owner_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 
     def __init__(self, title, body, owner):
         self.title = title
@@ -23,7 +23,7 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     username = db.Column(db.String(20), unique=True)
     password = db.Column(db.String(30))
-    blogs = db.relationship('Blog', backref='user.id')
+    posting = db.relationship('Blog', backref='owner')
 
     
 
@@ -33,9 +33,20 @@ class User(db.Model):
 
 @app.before_request
 def require_login():
-    allowed_routes = ['login', 'register']
+    allowed_routes = ['login', 'register', 'index', 'singleuser']
     if request.endpoint not in allowed_routes and 'username' not in session:
         return redirect('/login')
+
+#user index page
+
+@app.route('/index', methods=['POST', 'GET'])
+def index():
+    authors = User.query.all()
+    if request.method == 'GET':
+
+        return render_template('index.html', authors=authors)
+
+        
 
 
 #home
@@ -45,6 +56,7 @@ def home():
 
     title_error = ""
     body_error = ""
+    owner = User.query.filter_by(username=session['username']).first()
 
 
     blogs = Blog.query.all()
@@ -52,7 +64,8 @@ def home():
     if request.method == 'POST':
         title = request.form['title']
         body = request.form['body']
-        owner = User.query.filter_by(owner=session['owner']).first()
+        owner = User.query.filter_by(username=session['username']).first()
+        
         if not title:
             title_error="required field"
 
@@ -60,7 +73,7 @@ def home():
             body_error="required field"
 
         if not title or not body:
-            return render_template('home.html', blogs=blogs, title_error=title_error, body_error=body_error, owner =owner)
+            return render_template('home.html', blogs=blogs, title_error=title_error, body_error=body_error, owner=owner)
 
         new_blog = Blog(title, body, owner)
         db.session.add(new_blog)
@@ -70,15 +83,30 @@ def home():
 
     return render_template('home.html', blogs=blogs)
 
+
+#single user
+
+@app.route('/singleuser', methods=['POST', 'GET'])
+def singleuser():
+    allblogs = Blog.query.all()
+
+    
+    user_id=str(request.args.get('user'))
+    users = Blog.query.filter_by(owner_id=user_id).all()
+    return render_template('singleuser.html', users=users)
+    
+
 #blog
 
 @app.route('/blog', methods=['POST', 'GET'])
 def blog():
+    
     blog_id=request.args.get('id')
     blog_id_int=int(blog_id)
     blog = Blog.query.filter_by(id=blog_id_int).first()
     if blog:
         return render_template('blog.html', blog=blog)
+    
     else:
         return 'Not Found'
 
@@ -92,6 +120,7 @@ def login():
         username = request.form['username'] 
         password = request.form['password'] 
         user = User.query.filter_by(username=username).first()
+        
         if user and user.password == password:
             session['username'] = username
             flash("Logged in")
@@ -111,11 +140,19 @@ def register():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
+        passworderror = ''
+            
        
 
  # validate user's data
 
         existing_user = User.query.filter_by(username=username).first()
+        
+        if len(password)==0:
+            passworderror = 'password required'
+            
+            return render_template('register.html', username=username, passworderror=passworderror)
+        
         if not existing_user:
             new_user = User(username, password)
             db.session.add(new_user)
@@ -123,8 +160,8 @@ def register():
             session['username'] = username
             return redirect('/')
         else:
-            # TODO - user better response messaging
-            return "<h1>User Already Exists</h1>"
+            
+            return "<h1>User Exists</h1>"
 
     return render_template('register.html')
 
@@ -133,11 +170,6 @@ def logout():
     del session['username']
     return redirect('/')
  
-@app.route('/welcome') 
-def welcome(): 
-    username = request.args.get('username') 
-    return render_template('welcome.html', username= username)
-
 
 
 

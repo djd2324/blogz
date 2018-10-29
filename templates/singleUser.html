@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>Singleuser-View</h1>
+
+
+        {% for user in users %}    
+        <p>{{user.title}}</p>
+        <p>{{user.body}} </p>  
+        <p>{{user.owner.username}} </p>        
+            
+        <hr />
+        {% endfor %}
+            
+
+            
+{% endblock %}
